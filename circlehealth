@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Circle Health Group — Secure Payment</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --chg-blue:       #29ABE2;   /* exact logo sky blue */
+  --chg-blue-dark:  #1A96CC;   /* hover / pressed */
+  --chg-blue-deep:  #0E7DAD;   /* darker text/headers */
+  --chg-blue-pale:  #EDF8FD;   /* tinted surfaces */
+  --chg-blue-mid:   #B8E4F5;   /* borders on tinted */
+  --white:          #FFFFFF;
+  --off:            #F5FAFE;
+  --ink:            #1A2B36;
+  --ink-mid:        #3D5A6E;
+  --ink-light:      #7A96A8;
+  --border:         #D4E8F2;
+
+  --red:            #D0021B;
+  --red-pale:       #FFF0F2;
+  --green:          #107D54;
+  --green-pale:     #E8F5EF;
+
+  --radius:    14px;
+  --radius-sm: 9px;
+  --shadow:    0 2px 16px rgba(41,171,226,0.10);
+  --shadow-lg: 0 8px 36px rgba(41,171,226,0.16);
+  --font: 'Nunito', sans-serif;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--off);
+  font-family: var(--font);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── PAGES ───────────────────────────────────────────────────── */
+.page { display: none; flex-direction: column; min-height: 100vh; }
+.page.active { display: flex; }
+
+/* ══════════════════════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════════════════════ */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 10px rgba(41,171,226,0.08);
+}
+
+/* ── SSL badge ───────────────────────────────────────────────── */
+.ssl-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  background: var(--green-pale);
+  border: 1px solid rgba(16,125,84,0.22);
+  border-radius: 20px;
+  padding: 5px 11px;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BLUE BANNER STRIP
+══════════════════════════════════════════════════════════════ */
+.page-banner {
+  background: var(--chg-blue);
+  padding: 13px 16px 15px;
+  text-align: center;
+}
+.page-banner h1 {
+  font-size: 16px;
+  font-weight: 800;
+  color: white;
+}
+.page-banner p {
+  font-size: 11px;
+  color: rgba(255,255,255,0.80);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════════════════ */
+main {
+  flex: 1;
+  padding: 16px 16px 48px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── SUMMARY CARD ────────────────────────────────────────────── */
+.summary-card {
+  background: var(--chg-blue-deep);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 18px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.summary-card::before {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+.summary-card::after {
+  content: '';
+  position: absolute;
+  left: 40px; bottom: -60px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+.sc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.sc-ref {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.65;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.sc-inv {
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.14);
+  border-radius: 6px;
+  padding: 3px 9px;
+}
+.sc-patient {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+.sc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.sc-row .sl { opacity: 0.68; }
+.sc-row .sv { font-weight: 600; }
+.sc-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.18);
+  margin: 12px 0;
+}
+.sc-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sc-total-label { font-size: 13px; font-weight: 600; opacity: 0.85; }
+.sc-total-amount { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+
+/* ── SECTION LABEL ───────────────────────────────────────────── */
+.sec-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--chg-blue-deep);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 18px 0 8px;
+}
+
+/* ── PANEL ───────────────────────────────────────────────────── */
+.panel {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+/* ── CARD TYPE CHIPS ─────────────────────────────────────────── */
+.chips { display: flex; gap: 8px; margin-bottom: 16px; }
+.chip {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  padding: 10px 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: white;
+  position: relative;
+  user-select: none;
+}
+.chip:active { transform: scale(0.97); }
+.chip.active { border-color: var(--chg-blue); background: var(--chg-blue-pale); }
+.chip-name { font-size: 10px; font-weight: 700; color: var(--ink-mid); }
+.chip.active .chip-name { color: var(--chg-blue-deep); }
+.chip-tick {
+  position: absolute; top: 5px; right: 6px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--chg-blue);
+  display: none; align-items: center; justify-content: center;
+}
+.chip.active .chip-tick { display: flex; }
+
+/* ── FIELDS ──────────────────────────────────────────────────── */
+.field { margin-bottom: 15px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: block;
+  font-size: 12px; font-weight: 700;
+  color: var(--ink-mid);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+.input-wrap { position: relative; }
+.field input {
+  width: 100%;
+  height: 50px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 46px 0 14px;
+  font-family: var(--font);
+  font-size: 15px; font-weight: 600;
+  color: var(--ink);
+  background: white;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  -webkit-appearance: none;
+}
+.field input::placeholder { color: var(--ink-light); font-weight: 400; }
+.field input:focus {
+  border-color: var(--chg-blue);
+  box-shadow: 0 0 0 3px rgba(41,171,226,0.15);
+}
+.field input.is-error {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(208,2,27,0.09);
+}
+.field input.is-valid { border-color: var(--green); }
+
+.field-icon {
+  position: absolute; right: 13px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; color: var(--ink-light);
+  display: flex; align-items: center;
+}
+.status-icon {
+  position: absolute; right: 11px; top: 50%;
+  transform: translateY(-50%);
+  display: none; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+}
+.status-icon.show { display: flex; }
+
+.field-error {
+  display: none; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700; color: var(--red);
+  margin-top: 5px;
+}
+.field-error.show { display: flex; }
+
+.field-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin-bottom: 15px;
+}
+.field-row .field { margin-bottom: 0; }
+
+/* ── PAY BUTTON ──────────────────────────────────────────────── */
+.pay-btn {
+  width: 100%; height: 56px;
+  background: var(--chg-blue);
+  color: white; border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 17px; font-weight: 800;
+  cursor: pointer; letter-spacing: 0.01em;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background 0.18s, transform 0.1s, box-shadow 0.18s;
+  box-shadow: 0 5px 22px rgba(41,171,226,0.42);
+  margin-top: 4px;
+}
+.pay-btn:hover { background: var(--chg-blue-dark); }
+.pay-btn:active { transform: scale(0.98); }
+
+.security-note {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 11px; color: var(--ink-light); font-weight: 600; margin-top: 12px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INVOICE PAGE
+══════════════════════════════════════════════════════════════ */
+.success-block {
+  text-align: center; padding: 26px 0 18px;
+}
+.success-ring {
+  width: 76px; height: 76px;
+  border-radius: 50%;
+  background: var(--green-pale);
+  border: 2.5px solid var(--green);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  animation: pop 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.success-block h2 { font-size: 22px; font-weight: 800; color: var(--chg-blue-deep); margin-bottom: 5px; }
+.success-block p  { font-size: 13px; color: var(--ink-light); font-weight: 500; }
+
+.receipt {
+  background: white; border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px;
+}
+.receipt-header {
+  background: var(--chg-blue);
+  padding: 18px 20px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.rh-label { font-size: 10px; font-weight: 700; opacity: 0.72; text-transform: uppercase; letter-spacing: 0.09em; color: white; margin-bottom: 3px; }
+.rh-num   { font-size: 18px; font-weight: 800; color: white; }
+.rh-val   { font-size: 14px; font-weight: 700; color: white; }
+.rh-right { text-align: right; }
+.paid-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.38);
+  color: white; font-size: 11px; font-weight: 800;
+  border-radius: 20px; padding: 4px 11px;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-top: 10px;
+}
+.receipt-body { padding: 18px 20px; }
+.r-section { margin-bottom: 18px; }
+.r-section:last-child { margin-bottom: 0; }
+.r-section-title {
+  font-size: 10px; font-weight: 800; color: var(--chg-blue);
+  text-transform: uppercase; letter-spacing: 0.09em;
+  margin-bottom: 10px; padding-bottom: 7px;
+  border-bottom: 1.5px solid var(--border);
+}
+.r-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+.r-row .rl { font-size: 13px; color: var(--ink-light); font-weight: 500; }
+.r-row .rv { font-size: 13px; color: var(--ink); font-weight: 700; }
+.r-total {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--chg-blue-pale); border: 1px solid var(--chg-blue-mid);
+  border-radius: 10px; padding: 12px 14px; margin-top: 10px;
+}
+.r-total .rtl { font-size: 13px; font-weight: 800; color: var(--chg-blue-deep); }
+.r-total .rtv { font-size: 26px; font-weight: 800; color: var(--chg-blue); letter-spacing: -0.02em; }
+
+.card-pill {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--off); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+}
+.card-pill-icon {
+  width: 40px; height: 26px;
+  background: var(--chg-blue); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.card-pill-text .ct { font-size: 13px; font-weight: 700; color: var(--ink); }
+.card-pill-text .cs { font-size: 12px; color: var(--ink-light); font-weight: 500; }
+
+.done-btn {
+  width: 100%; height: 52px;
+  background: var(--chg-blue); color: white; border: none;
+  border-radius: var(--radius); font-family: var(--font);
+  font-size: 16px; font-weight: 800; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 20px rgba(41,171,226,0.38);
+  transition: background 0.18s; margin-bottom: 10px;
+}
+.done-btn:hover { background: var(--chg-blue-dark); }
+.pdf-link {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 13px; font-weight: 700; color: var(--chg-blue);
+  cursor: pointer; padding: 8px;
+}
+
+/* ── animations ──────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.summary-card { animation: fadeUp 0.30s ease both; }
+.panel        { animation: fadeUp 0.34s ease both; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-7px); }
+  40%     { transform: translateX(7px); }
+  60%     { transform: translateX(-5px); }
+  80%     { transform: translateX(5px); }
+}
+.shake { animation: shake 0.38s ease both; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ PAYMENT PAGE ════════════════════════ -->
+<div class="page active" id="paymentPage">
+
+  <header>
+    <!--
+      Logo reproduced from screenshot:
+      – Large open ring (thick stroke circle) in sky blue #29ABE2
+      – "Circle" text sits inside/overlapping the ring
+      – "Health Group" text sits to the right of the ring
+      – All text same sky blue, clean sans-serif
+    -->
+    <svg width="196" height="48" viewBox="0 0 196 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Circle Health Group">
+      <!-- The large open ring -->
+      <circle cx="26" cy="24" r="20" stroke="#29ABE2" stroke-width="5" fill="none"/>
+      <!-- "Circle" text overlaid inside the ring -->
+      <text x="13" y="27" font-family="Nunito, sans-serif" font-weight="700" font-size="10.5" fill="#29ABE2" letter-spacing="0.2">Circle</text>
+      <!-- Vertical divider line between ring and text -->
+      <line x1="50" y1="14" x2="50" y2="34" stroke="#29ABE2" stroke-width="1.2" opacity="0.4"/>
+      <!-- "Health Group" wordmark -->
+      <text x="57" y="21" font-family="Nunito, sans-serif" font-weight="700" font-size="13" fill="#29ABE2" letter-spacing="0.1">Health</text>
+      <text x="57" y="37" font-family="Nunito, sans-serif" font-weight="700" font-size="13" fill="#29ABE2" letter-spacing="0.1">Group</text>
+    </svg>
+
+    <div class="ssl-badge">
+      <svg width="11" height="13" viewBox="0 0 11 13" fill="none">
+        <rect x="1" y="5.5" width="9" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M3.5 5.5V3.5a2 2 0 014 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Secure
+    </div>
+  </header>
+
+  <div class="page-banner">
+    <h1>Secure Patient Payment</h1>
+    <p>256-bit SSL encrypted · PCI DSS Level 1 compliant</p>
+  </div>
+
+  <main>
+
+    <!-- Invoice summary -->
+    <div class="summary-card">
+      <div class="sc-top">
+        <div class="sc-ref">Payment due</div>
+        <div class="sc-inv">CHG-2026-00142</div>
+      </div>
+      <div class="sc-patient">Emily Bennett</div>
+      <div class="sc-row"><span class="sl">Treatment</span><span class="sv">MRI</span></div>
+      <div class="sc-row"><span class="sl">Hospital</span><span class="sv">The Clementine Churchill Hospital</span></div>
+      <div class="sc-row"><span class="sl">Consultant</span><span class="sv">J Smith</span></div>
+      <div class="sc-row"><span class="sl">Appointment</span><span class="sv">20 April 2026</span></div>
+      <hr class="sc-divider">
+      <div class="sc-total">
+        <span class="sc-total-label">Total due</span>
+        <span class="sc-total-amount">£550.00</span>
+      </div>
+    </div>
+
+    <!-- Card type -->
+    <div class="sec-label">Select card type</div>
+    <div class="chips">
+      <div class="chip active" onclick="selectChip(this,'Visa')">
+        <span class="chip-tick"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1 3.5 3.5 6 8 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <svg width="46" height="15" viewBox="0 0 46 15"><text x="0" y="13" font-family="Nunito,sans-serif" font-weight="900" font-size="15" fill="#1A1F71">VISA</text></svg>
+        <span class="chip-name">Visa</span>
+      </div>
+      <div class="chip" onclick="selectChip(this,'Mastercard')">
+        <span class="chip-tick"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1 3.5 3.5 6 8 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <svg width="38" height="24" viewBox="0 0 38 24" fill="none">
+          <circle cx="14" cy="12" r="11" fill="#EB001B"/>
+          <circle cx="24" cy="12" r="11" fill="#F79E1B"/>
+          <path d="M19 3.8a11 11 0 010 16.4A11 11 0 0119 3.8z" fill="#FF5F00"/>
+        </svg>
+        <span class="chip-name">Mastercard</span>
+      </div>
+      <div class="chip" onclick="selectChip(this,'Amex')">
+        <span class="chip-tick"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1 3.5 3.5 6 8 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <svg width="40" height="24" viewBox="0 0 40 24" fill="none">
+          <rect width="40" height="24" rx="3" fill="#016FD0"/>
+          <text x="4" y="16" font-family="Nunito,sans-serif" font-weight="800" font-size="9.5" fill="white">AMEX</text>
+        </svg>
+        <span class="chip-name">Amex</span>
+      </div>
+    </div>
+
+    <!-- Card details -->
+    <div class="sec-label">Card details</div>
+    <div class="panel">
+      <div class="field">
+        <label>Cardholder name</label>
+        <div class="input-wrap">
+          <input type="text" id="cardName" placeholder="Name as shown on card" autocomplete="cc-name">
+          <span class="field-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Card number</label>
+        <div class="input-wrap">
+          <input type="text" id="cardNumber" inputmode="numeric" placeholder="0000  0000  0000  0000"
+                 maxlength="22" autocomplete="cc-number"
+                 oninput="formatCard(this)" onblur="validateCard(this)">
+          <span class="status-icon" id="cardStatus"></span>
+        </div>
+        <div class="field-error" id="cardError">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Must be 16 digits
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Expiry date</label>
+          <div class="input-wrap">
+            <input type="text" id="expiry" inputmode="numeric" placeholder="MM / YY"
+                   maxlength="7" autocomplete="cc-exp"
+                   oninput="formatExpiry(this)"
+                   onblur="validateExpiry(this)">
+            <span class="status-icon" id="expiryStatus"></span>
+          </div>
+          <div class="field-error" id="expiryError">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            Invalid or expired date
+          </div>
+        </div>
+        <div class="field">
+          <label>CVV / CVC</label>
+          <div class="input-wrap">
+            <input type="password" id="cvv" inputmode="numeric" placeholder="•••"
+                   maxlength="4" autocomplete="cc-csc"
+                   oninput="this.value=this.value.replace(/\D/g,'')">
+            <span class="field-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="11" width="22" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Billing postcode -->
+    <div class="sec-label">Billing postcode</div>
+    <div class="panel">
+      <div class="field">
+        <label>Postcode</label>
+        <div class="input-wrap">
+          <input type="text" id="postcode" placeholder="e.g. RG1 1AB"
+                 style="text-transform:uppercase"
+                 oninput="this.value=this.value.toUpperCase()">
+          <span class="field-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pay -->
+    <button class="pay-btn" id="payBtn" onclick="handlePay()">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="4" width="22" height="16" rx="2.5"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Pay £550.00 Securely
+    </button>
+
+    <div class="security-note">
+      <svg width="12" height="13" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 1L1 3v4c0 3.3 2.1 6.4 5 7.4C8.9 13.4 11 10.3 11 7V3L6 1z"/></svg>
+      No card data stored · Protected by Circle Health Group
+    </div>
+
+  </main>
+</div>
+
+
+<!-- ════════════════════ INVOICE PAGE ════════════════════════ -->
+<div class="page" id="invoicePage">
+
+  <header>
+    <svg width="196" height="48" viewBox="0 0 196 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Circle Health Group">
+      <circle cx="26" cy="24" r="20" stroke="#29ABE2" stroke-width="5" fill="none"/>
+      <text x="13" y="27" font-family="Nunito, sans-serif" font-weight="700" font-size="10.5" fill="#29ABE2" letter-spacing="0.2">Circle</text>
+      <line x1="50" y1="14" x2="50" y2="34" stroke="#29ABE2" stroke-width="1.2" opacity="0.4"/>
+      <text x="57" y="21" font-family="Nunito, sans-serif" font-weight="700" font-size="13" fill="#29ABE2" letter-spacing="0.1">Health</text>
+      <text x="57" y="37" font-family="Nunito, sans-serif" font-weight="700" font-size="13" fill="#29ABE2" letter-spacing="0.1">Group</text>
+    </svg>
+    <span style="font-size:12px;font-weight:800;color:var(--chg-blue);">Receipt</span>
+  </header>
+
+  <div class="page-banner">
+    <h1>Payment Confirmed</h1>
+    <p>Your receipt has been sent to your registered email address</p>
+  </div>
+
+  <main>
+
+    <div class="success-block">
+      <div class="success-ring">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#107D54" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h2>Payment successful</h2>
+      <p>Thank you, Emily. Your payment has been received.</p>
+    </div>
+
+    <div class="receipt">
+      <div class="receipt-header">
+        <div>
+          <div class="rh-label">Invoice number</div>
+          <div class="rh-num">CHG-2026-00142</div>
+          <div class="paid-pill">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Paid
+          </div>
+        </div>
+        <div class="rh-right">
+          <div class="rh-label">Date</div>
+          <div class="rh-val" id="rcptDate"></div>
+          <div class="rh-label" style="margin-top:8px">Time</div>
+          <div class="rh-val" id="rcptTime"></div>
+        </div>
+      </div>
+
+      <div class="receipt-body">
+        <div class="r-section">
+          <div class="r-section-title">Patient details</div>
+          <div class="r-row"><span class="rl">Name</span><span class="rv">Emily Bennett</span></div>
+          <div class="r-row"><span class="rl">Date of birth</span><span class="rv">01 January 1999</span></div>
+        </div>
+        <div class="r-section">
+          <div class="r-section-title">Treatment details</div>
+          <div class="r-row"><span class="rl">Procedure</span><span class="rv">MRI</span></div>
+          <div class="r-row"><span class="rl">Hospital</span><span class="rv">The Clementine Churchill Hospital</span></div>
+          <div class="r-row"><span class="rl">Consultant</span><span class="rv">J Smith</span></div>
+          <div class="r-row"><span class="rl">Appointment</span><span class="rv">20 April 2026</span></div>
+        </div>
+        <div class="r-section">
+          <div class="r-section-title">Charges</div>
+          <div class="r-row"><span class="rl">MRI scan</span><span class="rv">£550.00</span></div>
+          <div class="r-total">
+            <span class="rtl">Total paid</span>
+            <span class="rtv">£550.00</span>
+          </div>
+        </div>
+        <div class="r-section">
+          <div class="r-section-title">Payment method</div>
+          <div class="card-pill">
+            <div class="card-pill-icon">
+              <svg width="22" height="15" viewBox="0 0 24 16" fill="none"><rect width="24" height="16" rx="2" fill="rgba(255,255,255,0.15)"/><rect x="0" y="4" width="24" height="4" fill="rgba(255,255,255,0.3)"/><rect x="14" y="10" width="8" height="3" rx="1" fill="rgba(255,255,255,0.6)"/></svg>
+            </div>
+            <div class="card-pill-text">
+              <div class="ct" id="rcptCardType">Visa</div>
+              <div class="cs">ending <strong id="rcptLast4">•••• 4242</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="done-btn" onclick="resetToPayment()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Done
+    </button>
+    <div class="pdf-link" onclick="alert('In live deployment, this downloads a PDF receipt.')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PDF receipt
+    </div>
+
+  </main>
+</div>
+
+<script>
+  let activeCard = 'Visa';
+
+  function selectChip(el, name) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeCard = name;
+  }
+
+  function formatCard(input) {
+    let v = input.value.replace(/\D/g, '').slice(0, 16);
+    let out = [];
+    for (let i = 0; i < v.length; i += 4) out.push(v.slice(i, i + 4));
+    input.value = out.join('  ');
+    // clear error while still typing
+    setCard('neutral');
+  }
+
+  function validateCard(input) {
+    const digits = input.value.replace(/\s/g, '');
+    if (digits.length === 16) { setCard('valid'); return true; }
+    if (digits.length > 0)    { setCard('error'); return false; }
+    setCard('neutral'); return false;
+  }
+
+  function setCard(state) {
+    const inp  = document.getElementById('cardNumber');
+    const icon = document.getElementById('cardStatus');
+    const err  = document.getElementById('cardError');
+    inp.classList.remove('is-error', 'is-valid');
+    icon.classList.remove('show');
+    icon.innerHTML = '';
+    err.classList.remove('show');
+    if (state === 'error') {
+      inp.classList.add('is-error');
+      icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D0021B" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+      icon.classList.add('show');
+      err.classList.add('show');
+    } else if (state === 'valid') {
+      inp.classList.add('is-valid');
+      icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#107D54" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
+      icon.classList.add('show');
+    }
+  }
+
+  function formatExpiry(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length >= 3) v = v.slice(0, 2) + ' / ' + v.slice(2, 4);
+    else if (v.length === 2 && !input.value.includes('/')) v += ' / ';
+    input.value = v;
+    setExpiry('neutral');
+  }
+
+  function validateExpiry(input) {
+    const raw = input.value.replace(/\s/g, '');
+    const parts = raw.split('/');
+    if (parts.length !== 2) { setExpiry('error'); return false; }
+    const mm = parseInt(parts[0], 10);
+    const yy = parseInt(parts[1], 10);
+    if (isNaN(mm) || isNaN(yy) || mm < 1 || mm > 12) { setExpiry('error'); return false; }
+    const now = new Date();
+    const cy = now.getFullYear() % 100;
+    const cm = now.getMonth() + 1;
+    if (yy < cy || (yy === cy && mm < cm)) { setExpiry('error'); return false; }
+    setExpiry('valid');
+    return true;
+  }
+
+  function setExpiry(state) {
+    const inp  = document.getElementById('expiry');
+    const icon = document.getElementById('expiryStatus');
+    const err  = document.getElementById('expiryError');
+    inp.classList.remove('is-error', 'is-valid');
+    icon.classList.remove('show');
+    icon.innerHTML = '';
+    err.classList.remove('show');
+    if (state === 'error') {
+      inp.classList.add('is-error');
+      icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D0021B" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+      icon.classList.add('show');
+      err.classList.add('show');
+    } else if (state === 'valid') {
+      inp.classList.add('is-valid');
+      icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#107D54" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
+      icon.classList.add('show');
+    }
+  }
+
+  function handlePay() {
+    const name     = document.getElementById('cardName').value.trim();
+    const number   = document.getElementById('cardNumber').value.replace(/\s/g, '');
+    const expValid = validateExpiry(document.getElementById('expiry'));
+    const cvv      = document.getElementById('cvv').value.trim();
+    const postcode = document.getElementById('postcode').value.trim();
+
+    const cardValid = validateCard(document.getElementById('cardNumber'));
+    if (!name || !cardValid || !expValid || cvv.length < 3 || !postcode) {
+      const btn = document.getElementById('payBtn');
+      btn.classList.remove('shake');
+      void btn.offsetWidth;
+      btn.classList.add('shake');
+      btn.addEventListener('animationend', () => btn.classList.remove('shake'), { once: true });
+      return;
+    }
+
+    const now = new Date();
+    document.getElementById('rcptDate').textContent =
+      now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('rcptTime').textContent =
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('rcptCardType').textContent = activeCard;
+    document.getElementById('rcptLast4').textContent = '•••• ' + number.slice(-4);
+
+    document.getElementById('paymentPage').classList.remove('active');
+    document.getElementById('invoicePage').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function resetToPayment() {
+    // Production: cognigy.closeXApp({ status: 'paid', ref: 'CHG-2024-08741' });
+    document.getElementById('invoicePage').classList.remove('active');
+    document.getElementById('paymentPage').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  (function () {
+    const now = new Date();
+    document.getElementById('rcptDate').textContent =
+      now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('rcptTime').textContent =
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  })();
+</script>
+</body>
+</html>
